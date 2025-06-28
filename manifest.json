@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Emoji-B-Gone",
   "version": "1.0.0",
-  "description": "Removes emojis from web pages, with a configurable allow-list. Made with Gemini",
+  "description": "Removes emojis from web pages, with a configurable allow-list. Made with Gemini.",
   "permissions": [
     "storage",
     "tabs"
