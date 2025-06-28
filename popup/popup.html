@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-TF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emoji-B-Gone</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Emoji-B-Gone</h1>
+            <div class="toggle-switch">
+                <input type="checkbox" id="enabled-checkbox" class="toggle-input">
+                <label for="enabled-checkbox" class="toggle-label"></label>
+            </div>
+        </div>
+        <div class="allow-list">
+            <label for="allowed-emojis">Allow-list:</label>
+            <p class="description">Add emojis you want to keep. No separation needed.</p>
+            <textarea id="allowed-emojis" rows="3"></textarea>
+            <button id="save-button">Save</button>
+            <p id="save-status" class="status-message"></p>
+        </div>
+    </div>
+    <script src="popup.js"></script>
+</body>
+</html>

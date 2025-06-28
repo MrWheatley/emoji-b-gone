@@ -1,0 +1,35 @@
+{
+  "manifest_version": 3,
+  "name": "Emoji-B-Gone",
+  "version": "1.0.0",
+  "description": "Removes emojis from web pages, with a configurable allow-list. Made with Gemini",
+  "permissions": [
+    "storage",
+    "tabs"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "scripts": ["background.js"]
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content_scripts/emoji_remover.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_icon": {
+      "48": "icons/icon-48.png",
+      "96": "icons/icon-96.png"
+    },
+    "default_title": "Emoji-B-Gone",
+    "default_popup": "popup/popup.html"
+  },
+  "icons": {
+    "48": "icons/icon-48.png",
+    "96": "icons/icon-96.png"
+  }
+}
