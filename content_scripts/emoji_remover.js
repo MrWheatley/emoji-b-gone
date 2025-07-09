@@ -18,19 +18,29 @@ function buildRegex() {
 }
 
 function removeEmojis(node) {
-    // We only care about text nodes
+    // 1. Handle Text Nodes (for visible page text)
     if (node.nodeType === Node.TEXT_NODE) {
         // Avoid operating on nodes inside script/style/textarea tags
         const parentTag = node.parentElement?.tagName.toLowerCase();
         if (parentTag === 'script' || parentTag === 'style' || parentTag === 'textarea') {
             return;
         }
-        
+
         const newText = node.textContent.replace(emojiRegex, '');
         if (newText !== node.textContent) {
             node.textContent = newText;
         }
-    } else if (node.nodeType === Node.ELEMENT_NODE) {
+    } 
+    // 2. Handle Element Nodes (for tooltips and recursion)
+    else if (node.nodeType === Node.ELEMENT_NODE) {
+        // Clean the title attribute if it exists (for tooltips)
+        if (node.hasAttribute('title')) {
+            const newTitle = node.getAttribute('title').replace(emojiRegex, '');
+            if (newTitle !== node.getAttribute('title')) {
+                node.setAttribute('title', newTitle);
+            }
+        }
+        
         // Recursively call on child nodes
         for (const child of node.childNodes) {
             removeEmojis(child);
@@ -41,7 +51,8 @@ function removeEmojis(node) {
 function processPage() {
     if (isEnabled) {
         buildRegex();
-        removeEmojis(document.body);
+        // Process the entire document, including <head> for the <title> tag
+        removeEmojis(document.documentElement);
     }
 }
 
@@ -50,22 +61,31 @@ const observer = new MutationObserver((mutationsList) => {
     if (!isEnabled) return;
 
     for (const mutation of mutationsList) {
+        // Handles dynamically added elements
         if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
             for (const newNode of mutation.addedNodes) {
                 removeEmojis(newNode);
             }
-        } else if (mutation.type === 'characterData') {
-             // Handle cases where text content changes directly
+        } 
+        // Handles changes to text content
+        else if (mutation.type === 'characterData') {
              removeEmojis(mutation.target);
+        }
+        // Handles changes to tooltip text
+        else if (mutation.type === 'attributes' && mutation.attributeName === 'title') {
+            removeEmojis(mutation.target);
         }
     }
 });
 
 function startObserver() {
-    observer.observe(document.body, {
+    // Observe the entire document for changes
+    observer.observe(document.documentElement, {
         childList: true,
         subtree: true,
-        characterData: true
+        characterData: true,
+        attributes: true, // Watch for attribute changes
+        attributeFilter: ['title'] // Specifically watch the 'title' attribute for tooltips
     });
 }
 
@@ -93,17 +113,11 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
         if (message.allowedEmojis !== undefined) {
             allowedEmojis = message.allowedEmojis;
         }
-        
-        stopObserver(); // Stop to avoid issues while reprocessing
-        if (isEnabled) {
-            // Reloading the page is the most robust way to re-apply the filter
-            // when it's turned back on or the allow-list changes.
-            // A "soft" re-scan can miss things and be complex.
-            window.location.reload();
-        } else {
-             // If disabled, reload to restore original content.
-            window.location.reload();
-        }
+
+        stopObserver(); 
+        // Reloading the page is the most robust way to re-apply the filter
+        // when it's turned back on/off or the allow-list changes.
+        window.location.reload();
     }
 });
 
