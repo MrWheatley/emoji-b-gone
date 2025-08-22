@@ -1,11 +1,15 @@
 // Set initial state on installation
 browser.runtime.onInstalled.addListener(() => {
-  browser.storage.local.get(['isEnabled', 'allowedEmojis']).then(result => {
+  browser.storage.local.get(['isEnabled', 'allowedEmojis', 'blockList']).then(result => {
     if (result.isEnabled === undefined) {
       browser.storage.local.set({ isEnabled: true });
     }
     if (result.allowedEmojis === undefined) {
       browser.storage.local.set({ allowedEmojis: '' });
+    }
+    if (result.blockList === undefined) {
+      // Initialize the block list
+      browser.storage.local.set({ blockList: '' });
     }
   });
 });
