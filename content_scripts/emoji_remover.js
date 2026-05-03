@@ -125,7 +125,6 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
         }
         
         stopObserver();
-        window.location.reload();
     }
 });
 
